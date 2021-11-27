@@ -3,12 +3,15 @@ package com.unciv.logic
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.utils.Json
+import com.badlogic.gdx.utils.JsonWriter
+import com.sun.org.apache.xpath.internal.operations.Bool
 import com.unciv.UncivGame
 import com.unciv.models.metadata.GameSettings
 import java.io.File
 import kotlin.concurrent.thread
 
 object GameSaver {
+    private var saveJsonFormat = JsonWriter.OutputType.minimal
     private const val saveFilesFolder = "SaveFiles"
     private const val multiplayerFilesFolder = "MultiplayerGames"
     const val settingsFileName = "GameSettings.json"
@@ -20,7 +23,7 @@ object GameSaver {
      * See https://developer.android.com/training/data-storage/app-specific#external-access-files */
     var externalFilesDirForAndroid = ""
 
-    fun json() = Json().apply { setIgnoreDeprecated(true); ignoreUnknownFields = true } // Json() is NOT THREAD SAFE so we need to create a new one for each function
+    fun json() = Json().apply { setIgnoreDeprecated(true); ignoreUnknownFields = true; setOutputType(saveJsonFormat) } // Json() is NOT THREAD SAFE so we need to create a new one for each function
 
     fun getSubfolder(multiplayer: Boolean = false) = if (multiplayer) multiplayerFilesFolder else saveFilesFolder
 
@@ -166,6 +169,19 @@ object GameSaver {
         while (getAutosaves().count() > 10) {
             val saveToDelete = getAutosaves().minByOrNull { it: FileHandle -> it.lastModified() }!!
             deleteSave(saveToDelete.name())
+        }
+    }
+
+    /**
+     * Set the format to be used by the JSON writer
+     * If true, game save data will be in canonical (fully-quoted) json format
+     * Else, use the default minimal (unquoted keys) format
+     */
+    fun useCanonicalJson(flag: Boolean) {
+        saveJsonFormat = if (flag) {
+            JsonWriter.OutputType.json
+        } else {
+            JsonWriter.OutputType.minimal
         }
     }
 
