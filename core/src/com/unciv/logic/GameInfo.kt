@@ -39,6 +39,12 @@ class GameInfo {
     var currentTurnStartTime = 0L
     var gameId = UUID.randomUUID().toString() // random string
 
+    /**
+     * If this string is empty, the game is cloud-sync (i.e. DropBox)
+     * Else, use the contents as the hostname for the UnREST server
+     */
+    var gameServer = ""
+
     // Maps a civ to the civ they voted for
     var diplomaticVictoryVotesCast = HashMap<String, String>()
 
