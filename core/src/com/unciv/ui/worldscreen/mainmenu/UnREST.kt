@@ -51,7 +51,8 @@ object UnRESTClient {
     }
 
     fun downloadGameFullAsString(hostName: String, gameId: String): String {
-        //...
+        val stream = downloadGameFull(hostName, gameId)
+        return BufferedReader(InputStreamReader(stream)).readText()
     }
 
     fun uploadGameFull(hostName: String, gameId: String, data: String, overwrite: Boolean = false) {
@@ -61,5 +62,9 @@ object UnRESTClient {
     fun deleteGame(hostName: String, gameId: String) {
         //...
     }
+
+}
+
+class OnlineMultiplayerUnREST : OnlineMultiplayer {
 
 }
