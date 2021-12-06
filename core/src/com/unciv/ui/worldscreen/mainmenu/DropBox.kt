@@ -111,10 +111,10 @@ object DropBox {
 
 }
 
-class OnlineMultiplayer {
-    fun getGameLocation(gameId: String) = "/MultiplayerGames/$gameId"
+class OnlineMultiplayerDropbox : OnlineMultiplayer {
+    override fun getGameLocation(gameId: String) = "/MultiplayerGames/$gameId"
 
-    fun tryUploadGame(gameInfo: GameInfo, withPreview: Boolean){
+    override fun tryUploadGame(gameInfo: GameInfo, withPreview: Boolean){
         // We upload the gamePreview before we upload the game as this
         // seems to be necessary for the kick functionality
         if (withPreview) {
@@ -131,17 +131,17 @@ class OnlineMultiplayer {
      * @see tryUploadGame
      * @see GameInfo.asPreview
      */
-    fun tryUploadGamePreview(gameInfo: GameInfoPreview){
+    override fun tryUploadGamePreview(gameInfo: GameInfoPreview){
         val zippedGameInfo = Gzip.zip(GameSaver.json().toJson(gameInfo))
         DropBox.uploadFile("${getGameLocation(gameInfo.gameId)}_Preview", zippedGameInfo, true)
     }
 
-    fun tryDownloadGame(gameId: String): GameInfo {
+    override fun tryDownloadGame(gameId: String): GameInfo {
         val zippedGameInfo = DropBox.downloadFileAsString(getGameLocation(gameId))
         return GameSaver.gameInfoFromString(Gzip.unzip(zippedGameInfo))
     }
 
-    fun tryDownloadGamePreview(gameId: String): GameInfoPreview {
+    override fun tryDownloadGamePreview(gameId: String): GameInfoPreview {
         val zippedGameInfo = DropBox.downloadFileAsString("${getGameLocation(gameId)}_Preview")
         return GameSaver.gameInfoPreviewFromString(Gzip.unzip(zippedGameInfo))
     }
@@ -151,7 +151,7 @@ class OnlineMultiplayer {
      * Does not initialize transitive GameInfo data.
      * It is therefore stateless and safe to call for Multiplayer Turn Notifier, unlike tryDownloadGame().
      */
-    fun tryDownloadGameUninitialized(gameId: String): GameInfo {
+    override fun tryDownloadGameUninitialized(gameId: String): GameInfo {
         val zippedGameInfo = DropBox.downloadFileAsString(getGameLocation(gameId))
         return GameSaver.gameInfoFromStringWithoutTransients(Gzip.unzip(zippedGameInfo))
     }
